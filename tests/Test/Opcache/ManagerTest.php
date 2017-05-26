@@ -11,7 +11,17 @@ class ManagerTest extends TestCase
     {
         $manager = new Manager();
 
-        $this->assertTrue($manager->invalidate(__DIR__.'/../.stub/test.php'));
+        $this->assertTrue($manager->invalidate(__DIR__.'/../.stub/test.php', true));
+    }
+
+    /**
+     * @depends testInvalidate
+     */
+    public function testIsCachedBeforeCompile()
+    {
+        $manager = new Manager();
+
+        $this->assertFalse($manager->isCached(__DIR__.'/../.stub/test.php'));
     }
 
     public function testCompile()
@@ -19,6 +29,16 @@ class ManagerTest extends TestCase
         $manager = new Manager();
 
         $this->assertTrue($manager->compile(__DIR__.'/../.stub/test.php'));
+    }
+
+    /**
+     * @depends testCompile
+     */
+    public function testIsCachedAfterCompile()
+    {
+        $manager = new Manager();
+
+        $this->assertTrue($manager->isCached(__DIR__.'/../.stub/test.php'));
     }
 
     public function testStatus()
