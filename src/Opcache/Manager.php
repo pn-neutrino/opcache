@@ -9,6 +9,18 @@ namespace Neutrino\Opcache;
  */
 class Manager
 {
+    private static $available;
+
+    public function available()
+    {
+        if (!isset(self::$available)) {
+            self::$available = extension_loaded('Zend Opcache')
+                && (ini_get('opcache.enable') === '1' || ini_get('opcache.enable_cli') === '1');
+        }
+
+        return self::$available;
+    }
+
     /**
      * Resets the contents of the opcode cache
      *
@@ -18,7 +30,7 @@ class Manager
      */
     public function reset()
     {
-        return opcache_reset();
+        return self::available() && opcache_reset();
     }
 
     /**
@@ -31,7 +43,7 @@ class Manager
      */
     public function invalidate($file, $force = false)
     {
-        return opcache_invalidate($file, $force);
+        return  self::available() && opcache_invalidate($file, $force);
     }
 
     /**
@@ -43,7 +55,7 @@ class Manager
      */
     public function compile($file)
     {
-        return opcache_compile_file($file);
+        return self::available() && opcache_compile_file($file);
     }
 
     /**
@@ -56,7 +68,7 @@ class Manager
      */
     public function isCached($file)
     {
-        return opcache_is_script_cached($file);
+        return self::available() && opcache_is_script_cached($file);
     }
 
     /**
@@ -68,7 +80,11 @@ class Manager
      */
     public function status($withScript = true)
     {
-        return opcache_get_status($withScript);
+        if (self::available()) {
+            return opcache_get_status($withScript);
+        }
+
+        return [];
     }
 
     /**
@@ -78,6 +94,10 @@ class Manager
      */
     public function configuration()
     {
-        return opcache_get_configuration();
+        if (self::available()) {
+            return opcache_get_configuration();
+        }
+
+        return [];
     }
 }
