@@ -10,33 +10,6 @@ namespace Neutrino\Opcache;
 class Manager
 {
     /**
-     * Manager constructor.
-     *
-     * @throws \RuntimeException
-     */
-    public function __construct()
-    {
-        if (!$this->available()) {
-            throw new \RuntimeException('Opcache module not loaded');
-        }
-    }
-
-    /**
-     * Check if opcache extension is loaded
-     *
-     * @return bool
-     */
-    private function available()
-    {
-        return extension_loaded('Zend OPcache')
-            && intval(
-                php_sapi_name() === 'cli'
-                    ? ini_get('opcache.enable_cli')
-                    : ini_get('opcache.enable')
-            );
-    }
-
-    /**
      * Resets the contents of the opcode cache
      *
      * @return bool
