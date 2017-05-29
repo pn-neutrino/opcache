@@ -5,5 +5,3 @@ Neutrino : Opcache component
 Opcache manager.
 
 Allow manage opcache extension directly from php.
-
-Particularly useful if you need to reset all opcache without restarting your server (php-fpm / ...), or compile / invalidate a specific file.

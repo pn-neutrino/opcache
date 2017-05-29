@@ -9,16 +9,38 @@ namespace Neutrino\Opcache;
  */
 class Manager
 {
+    /** @var bool */
     private static $available;
 
-    public function available()
+    /** @var bool */
+    private static $enable;
+
+    /**
+     * Check if opcache extension is loaded.
+     *
+     * @return bool
+     */
+    public static function isAvailable()
     {
         if (!isset(self::$available)) {
-            self::$available = extension_loaded('Zend Opcache')
-                && (ini_get('opcache.enable') === '1' || ini_get('opcache.enable_cli') === '1');
+            self::$available = extension_loaded('Zend Opcache');
         }
 
         return self::$available;
+    }
+
+    /**
+     * Check if Opcache is available for the current context : [CGI/FPM/..] <> CLI
+     *
+     * @return bool
+     */
+    public static function isEnable()
+    {
+        if (!isset(self::$enable)) {
+            self::$enable = self::isAvailable() && ini_get('opcache.enable') === '1' && (php_sapi_name() === 'cli' ? ini_get('opcache.enable_cli') === '1' : true);
+        }
+
+        return self::$enable;
     }
 
     /**
@@ -30,7 +52,7 @@ class Manager
      */
     public function reset()
     {
-        return self::available() && opcache_reset();
+        return self::isEnable() && opcache_reset();
     }
 
     /**
@@ -43,7 +65,7 @@ class Manager
      */
     public function invalidate($file, $force = false)
     {
-        return  self::available() && opcache_invalidate($file, $force);
+        return self::isEnable() && opcache_invalidate($file, $force);
     }
 
     /**
@@ -55,7 +77,7 @@ class Manager
      */
     public function compile($file)
     {
-        return self::available() && opcache_compile_file($file);
+        return self::isEnable() && opcache_compile_file($file);
     }
 
     /**
@@ -68,7 +90,7 @@ class Manager
      */
     public function isCached($file)
     {
-        return self::available() && opcache_is_script_cached($file);
+        return self::isEnable() && opcache_is_script_cached($file);
     }
 
     /**
@@ -80,11 +102,7 @@ class Manager
      */
     public function status($withScript = true)
     {
-        if (self::available()) {
-            return opcache_get_status($withScript);
-        }
-
-        return [];
+        return self::isEnable() ? opcache_get_status($withScript) : [];
     }
 
     /**
@@ -94,10 +112,6 @@ class Manager
      */
     public function configuration()
     {
-        if (self::available()) {
-            return opcache_get_configuration();
-        }
-
-        return [];
+        return self::isAvailable() ? opcache_get_configuration() : [];
     }
 }
