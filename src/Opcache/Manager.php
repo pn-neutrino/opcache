@@ -102,11 +102,7 @@ class Manager
      */
     public function status($withScript = true)
     {
-        if (self::isEnable()) {
-            return opcache_get_status($withScript);
-        }
-
-        return [];
+        return self::isEnable() ? opcache_get_status($withScript) : [];
     }
 
     /**
@@ -116,10 +112,6 @@ class Manager
      */
     public function configuration()
     {
-        if (self::isAvailable()) {
-            return opcache_get_configuration();
-        }
-
-        return [];
+        return self::isAvailable() ? opcache_get_configuration() : [];
     }
 }
